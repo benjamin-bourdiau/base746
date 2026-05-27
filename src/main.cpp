@@ -12,29 +12,39 @@ static void event_handler(lv_event_t * e)
     }
 }
 
-void testLvgl()
+static void slider_event_cb(lv_event_t * e)
+{
+    // On récupère le slider qui a déclenché l'événement
+    lv_obj_t * slider = (lv_obj_t *)lv_event_get_target(e);
+    
+    // On récupère le label qu'on a passé en user_data
+    lv_obj_t * label = (lv_obj_t *)lv_event_get_user_data(e);
+
+    // On lit la valeur actuelle du slider
+    int32_t value = lv_slider_get_value(slider);
+
+    // On met à jour le texte du label avec la nouvelle valeur
+    lv_label_set_text_fmt(label, "Valeur : %d", (int)value);
+}
+
+void gestionScreen()
 {
   // Initialisations générales
-  lv_obj_t * label;
+  lv_obj_t * label = lv_label_create(lv_screen_active());
 
-  lv_obj_t * btn1 = lv_button_create(lv_screen_active());
-  lv_obj_add_event_cb(btn1, event_handler, LV_EVENT_ALL, NULL);
-  lv_obj_align(btn1, LV_ALIGN_CENTER, 0, -40);
-  lv_obj_remove_flag(btn1, LV_OBJ_FLAG_PRESS_LOCK);
+  lv_label_set_text(label, "Valeur : 0");
+  lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+  lv_obj_align(label, LV_ALIGN_CENTER, 0, -100); 
 
-  label = lv_label_create(btn1);
-  lv_label_set_text(label, "Button");
-  lv_obj_center(label);
+  lv_obj_t * slider = lv_slider_create(lv_screen_active());
+  lv_slider_set_range(slider, 0, 10);
+  lv_obj_set_size(slider, 20, 150);
+  lv_obj_center(slider);
 
-  lv_obj_t * btn2 = lv_button_create(lv_screen_active());
-  lv_obj_add_event_cb(btn2, event_handler, LV_EVENT_ALL, NULL);
-  lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 40);
-  lv_obj_add_flag(btn2, LV_OBJ_FLAG_CHECKABLE);
-  lv_obj_set_height(btn2, LV_SIZE_CONTENT);
-
-  label = lv_label_create(btn2);
-  lv_label_set_text(label, "Toggle");
-  lv_obj_center(label);
+  lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, label);
+  
+  lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x2D2D2D), LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_COVER, LV_PART_MAIN);
 }
 
 #ifdef ARDUINO
@@ -50,7 +60,7 @@ void mySetup()
   // lv_demo_widgets();
 
   // Initialisations générales
-  testLvgl();
+  gestionScreen();
 }
 
 void loop()
