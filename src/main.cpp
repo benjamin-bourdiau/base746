@@ -1,5 +1,17 @@
 #include "lvgl.h"
+#include <Wire.h>
+#include <SPI.h>
 
+const int SPI_CS_PIN = 3;
+
+const uint32_t MCP42010_SPI_SPEED = 2000000;
+
+const uint8_t MCP42010_POT_0 = 0x01;
+const uint8_t MCP42010_POT_1 = 0x02;
+const uint8_t MCP42010_POT_BOTH = 0x03;
+
+const uint8_t MCP42010_CMD_WRITE = 0x10;
+const uint8_t MCP42010_CMD_SHUTDOWN = 0x20;
 
 /*static void slider_event_cb(lv_event_t * e)
 {
@@ -11,6 +23,56 @@
 
     lv_label_set_text_fmt(label, "Valeur : %d", (int)value);
 }*/
+
+void mcp42010Write(uint8_t command, uint8_t value)
+{
+  SPI.beginTransaction(SPISettings(MCP42010_SPI_SPEED, MSBFIRST, SPI_MODE0));
+
+  digitalWrite(SPI_CS_PIN, LOW);
+  SPI.transfer(command);
+  SPI.transfer(value);
+  digitalWrite(SPI_CS_PIN, HIGH);
+
+  SPI.endTransaction();
+}
+
+void mcp42010SetPot(uint8_t pot, uint8_t value)
+{
+  mcp42010Write(MCP42010_CMD_WRITE | pot, value);
+}
+
+void mcp42010Shutdown(uint8_t pot)
+{
+  mcp42010Write(MCP42010_CMD_SHUTDOWN | pot, 0x00);
+}
+
+void init_MCP42010()
+{
+  pinMode(SPI_CS_PIN, OUTPUT);
+  digitalWrite(SPI_CS_PIN, HIGH);
+
+  SPI.begin();
+
+  mcp42010SetPot(MCP42010_POT_BOTH, 0x80); //volume milieu
+}
+
+void tdaWrite(uint8_t reg, uint8_t val) {
+  Wire.beginTransmission(0x44);
+  Wire.write(reg);
+  Wire.write(val);
+  Serial.println(Wire.endTransmission());
+}
+
+void init_TDA7439() {
+  tdaWrite(0x00, 0x03); // IN1
+  tdaWrite(0x01, 0x00); // input gain 0 dB
+  tdaWrite(0x02, 0x08); // volume -8 dB
+  tdaWrite(0x03, 0x07); // bass 0 dB
+  tdaWrite(0x04, 0x07); // mid 0 dB
+  tdaWrite(0x05, 0x07); // treble 0 dB
+  tdaWrite(0x06, 0x00); // attenuation R 0 dB
+  tdaWrite(0x07, 0x00); // attenuation L 0 dB
+}
 
 void gestionScreen()
 {
@@ -107,10 +169,11 @@ void gestionScreen()
 
 void mySetup()
 {
-  // à décommenter pour tester la démo
-  // lv_demo_widgets();
+  init_TDA7439();
+  init_MCP42010();
 
-  // Initialisations générales
+  mcp42010Shutdown(MCP42010_POT_BOTH);
+
   gestionScreen();
 }
 
