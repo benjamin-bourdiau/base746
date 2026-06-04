@@ -13,6 +13,17 @@ const uint8_t MCP42010_POT_BOTH = 0x03;
 const uint8_t MCP42010_CMD_WRITE = 0x10;
 const uint8_t MCP42010_CMD_SHUTDOWN = 0x20;
 
+lv_obj_t * sliderTr1;
+lv_obj_t * sliderMid1;
+lv_obj_t * sliderBass1;
+lv_obj_t * sliderTr2;
+lv_obj_t * sliderMid2;
+lv_obj_t * sliderBass2;
+lv_obj_t * volume1;
+lv_obj_t * volume2;
+
+// (Tu peux ajouter les autres sliders ici si besoin)
+
 /*static void slider_event_cb(lv_event_t * e)
 {
     lv_obj_t * slider = (lv_obj_t *)lv_event_get_target(e);
@@ -69,7 +80,7 @@ void init_TDA7439() {
   Wire.begin();
   tdaWrite(0x00, 0x03); // IN1
   tdaWrite(0x01, 0x00); // input gain 0 dB
-  tdaWrite(0x02, 0x00); // volume -0 dB
+  tdaWrite(0x02, 0x08); // volume -8 dB
   tdaWrite(0x03, 0x07); // bass 0 dB
   tdaWrite(0x04, 0x07); // mid 0 dB
   tdaWrite(0x05, 0x07); // treble 0 dB
@@ -95,33 +106,33 @@ void gestionScreen()
   lv_obj_set_style_text_color(bass, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
   lv_obj_align(bass, LV_ALIGN_TOP_MID, 0, 5);
 
-  lv_obj_t * sliderTr1 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderTr1, 0, 10);
+  sliderTr1 = lv_slider_create(lv_screen_active());
+  lv_slider_set_range(sliderTr1, 0, 15);
   lv_obj_set_size(sliderTr1, 20, 100);
   lv_obj_align(sliderTr1, LV_ALIGN_TOP_LEFT, 30, 25);
 
-  lv_obj_t * sliderMid1 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderMid1, 0, 10);
+  sliderMid1 = lv_slider_create(lv_screen_active());
+  lv_slider_set_range(sliderMid1, 0, 15);
   lv_obj_set_size(sliderMid1, 20, 100);
   lv_obj_align(sliderMid1, LV_ALIGN_TOP_LEFT, 130, 25);
 
-  lv_obj_t * sliderBass1 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderBass1, 0, 10);
+  sliderBass1 = lv_slider_create(lv_screen_active());
+  lv_slider_set_range(sliderBass1, 0, 15);
   lv_obj_set_size(sliderBass1, 20, 100);
   lv_obj_align(sliderBass1, LV_ALIGN_TOP_MID, 0, 25);
 
-  lv_obj_t * sliderTr2 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderTr2, 0, 10);
+  sliderTr2 = lv_slider_create(lv_screen_active());
+  lv_slider_set_range(sliderTr2, 0, 15);
   lv_obj_set_size(sliderTr2, 20, 100);
   lv_obj_align(sliderTr2, LV_ALIGN_BOTTOM_LEFT, 30, -15);
 
-  lv_obj_t * sliderMid2 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderMid2, 0, 10);
+  sliderMid2 = lv_slider_create(lv_screen_active());
+  lv_slider_set_range(sliderMid2, 0, 15);
   lv_obj_set_size(sliderMid2, 20, 100);
   lv_obj_align(sliderMid2, LV_ALIGN_BOTTOM_LEFT, 130, -15);
 
-  lv_obj_t * sliderBass2 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderBass2, 0, 10);
+  sliderBass2 = lv_slider_create(lv_screen_active());
+  lv_slider_set_range(sliderBass2, 0, 15);
   lv_obj_set_size(sliderBass2, 20, 100);
   lv_obj_align(sliderBass2, LV_ALIGN_BOTTOM_MID, 0, -15);
 
@@ -139,14 +150,14 @@ void gestionScreen()
   lv_obj_set_style_text_color(vol, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
   lv_obj_align(vol, LV_ALIGN_TOP_MID, 0, 0); */
 
-  lv_obj_t * volume1 = lv_arc_create(vol_panel);
+  volume1 = lv_arc_create(vol_panel);
   lv_arc_set_range(volume1, 0, 10);
   lv_arc_set_bg_angles(volume1, 135, 45);
   lv_obj_set_size(volume1, 110, 110);
   lv_obj_remove_flag(volume1, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_align(volume1, LV_ALIGN_CENTER, 0, -55); 
 
-  lv_obj_t * volume2 = lv_arc_create(vol_panel);
+  volume2 = lv_arc_create(vol_panel);
   lv_arc_set_range(volume2, 0, 10);
   lv_arc_set_bg_angles(volume2, 135, 45);
   lv_obj_set_size(volume2, 110, 110);
@@ -188,17 +199,36 @@ void loop()
 
 void myTask(void *pvParameters)
 {
-  // Init
   TickType_t xLastWakeTime;
-  // Lecture du nombre de ticks quand la tâche débute
   xLastWakeTime = xTaskGetTickCount();
+
+  // Variables pour mémoriser les valeurs de la boucle précédente
+  int32_t old_vol1 = -1;
+  int32_t old_treble1 = -1;
+
   while (1)
   {
-    // Loop
+    lv_lock();
+    
+    int32_t current_vol1 = lv_arc_get_value(volume1);
+    int32_t current_treble1 = lv_slider_get_value(sliderTr1);
 
-    // Endort la tâche pendant le temps restant par rapport au réveil,
-    // ici 200ms, donc la tâche s'effectue toutes les 200ms
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(200)); // toutes les 200 ms
+    lv_unlock();
+
+    if (current_vol1 != old_vol1) 
+    {
+      uint8_t spi_val = (current_vol1 * 255) / 10;
+      mcp42010SetPot(MCP42010_POT_0, spi_val);
+      old_vol1 = current_vol1; 
+    }
+
+    if (current_treble1 != old_treble1) 
+    {
+      tdaWrite(0x05, (uint8_t)current_treble1);
+      old_treble1 = current_treble1;
+    }
+
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(200)); 
   }
 }
 
