@@ -164,9 +164,6 @@ void gestionScreen()
 
 #include "lvglDrivers.h"
 
-// à décommenter pour tester la démo
-// #include "demos/lv_demos.h"
-
 void mySetup()
 {
   init_TDA7439();
