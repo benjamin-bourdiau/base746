@@ -202,25 +202,26 @@ void myTask(void *pvParameters)
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
 
-  // Variables pour mémoriser les valeurs de la boucle précédente
-  int32_t old_vol1 = -1;
   int32_t old_treble1 = -1;
+  int32_t old_mid1 = -1;
+  int32_t old_bass1 = -1;
+  int32_t old_treble2 = -1;
+  int32_t old_mid2 = -1;
+  int32_t old_bass2 = -1;
 
   while (1)
   {
     lv_lock();
     
-    int32_t current_vol1 = lv_arc_get_value(volume1);
     int32_t current_treble1 = lv_slider_get_value(sliderTr1);
+    int32_t current_mid1 = lv_slider_get_value(sliderMid1);
+    int32_t current_bass1 = lv_slider_get_value(sliderBass1);
+
+    int32_t current_treble2 = lv_slider_get_value(sliderTr2);
+    int32_t current_mid2 = lv_slider_get_value(sliderMid2);
+    int32_t current_bass2 = lv_slider_get_value(sliderBass2);
 
     lv_unlock();
-
-    if (current_vol1 != old_vol1) 
-    {
-      uint8_t spi_val = (current_vol1 * 255) / 10;
-      mcp42010SetPot(MCP42010_POT_0, spi_val);
-      old_vol1 = current_vol1; 
-    }
 
     if (current_treble1 != old_treble1) 
     {
@@ -228,6 +229,36 @@ void myTask(void *pvParameters)
       old_treble1 = current_treble1;
     }
 
+    if (current_mid1 != old_mid1) 
+    {
+      tdaWrite(0x05, (uint8_t)current_treble1);
+      old_treble1 = current_treble1;
+    }
+
+    if (current_bass1 != old_bass1) 
+    {
+      tdaWrite(0x05, (uint8_t)current_treble1);
+      old_treble1 = current_treble1;
+    }
+
+    if (current_treble2 != old_treble2) 
+    {
+      tdaWrite(0x05, (uint8_t)current_treble1);
+      old_treble1 = current_treble1;
+    }
+
+    if (current_mid2 != old_mid2) 
+    {
+      tdaWrite(0x05, (uint8_t)current_treble1);
+      old_treble1 = current_treble1;
+    }
+
+    if (current_bass2 != old_bass2) 
+    {
+      tdaWrite(0x05, (uint8_t)current_treble1);
+      old_treble1 = current_treble1;
+    }
+    
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(200)); 
   }
 }
