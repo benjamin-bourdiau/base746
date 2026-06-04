@@ -54,24 +54,28 @@ void init_MCP42010()
   SPI.begin();
 
   mcp42010SetPot(MCP42010_POT_BOTH, 0x80); //volume milieu
+  Serial.println("mcp ON");
+
 }
 
 void tdaWrite(uint8_t reg, uint8_t val) {
   Wire.beginTransmission(0x44);
   Wire.write(reg);
   Wire.write(val);
-  Serial.println(Wire.endTransmission());
+  Wire.endTransmission();
 }
 
 void init_TDA7439() {
+  Wire.begin();
   tdaWrite(0x00, 0x03); // IN1
   tdaWrite(0x01, 0x00); // input gain 0 dB
-  tdaWrite(0x02, 0x08); // volume -8 dB
+  tdaWrite(0x02, 0x00); // volume -0 dB
   tdaWrite(0x03, 0x07); // bass 0 dB
   tdaWrite(0x04, 0x07); // mid 0 dB
   tdaWrite(0x05, 0x07); // treble 0 dB
   tdaWrite(0x06, 0x00); // attenuation R 0 dB
   tdaWrite(0x07, 0x00); // attenuation L 0 dB
+  Serial.println("tda on");
 }
 
 void gestionScreen()
@@ -164,12 +168,15 @@ void gestionScreen()
 
 #include "lvglDrivers.h"
 
+// à décommenter pour tester la démo
+// #include "demos/lv_demos.h"
+
 void mySetup()
 {
+  Serial.println("test");
+  
   init_TDA7439();
   init_MCP42010();
-
-  mcp42010Shutdown(MCP42010_POT_BOTH);
 
   gestionScreen();
 }
