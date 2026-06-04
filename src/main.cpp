@@ -121,7 +121,7 @@ void gestionScreen()
   lv_obj_set_size(sliderBass1, 20, 100);
   lv_obj_align(sliderBass1, LV_ALIGN_TOP_MID, 0, 25);
 
-  sliderTr2 = lv_slider_create(lv_screen_active());
+  /*sliderTr2 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderTr2, 0, 15);
   lv_obj_set_size(sliderTr2, 20, 100);
   lv_obj_align(sliderTr2, LV_ALIGN_BOTTOM_LEFT, 30, -15);
@@ -134,7 +134,7 @@ void gestionScreen()
   sliderBass2 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderBass2, 0, 15);
   lv_obj_set_size(sliderBass2, 20, 100);
-  lv_obj_align(sliderBass2, LV_ALIGN_BOTTOM_MID, 0, -15);
+  lv_obj_align(sliderBass2, LV_ALIGN_BOTTOM_MID, 0, -15);*/
 
   lv_obj_t * vol_panel = lv_obj_create(lv_screen_active());
   lv_obj_set_size(vol_panel, 150, 250); 
@@ -205,6 +205,7 @@ void myTask(void *pvParameters)
   int32_t old_treble1 = -1;
   int32_t old_mid1 = -1;
   int32_t old_bass1 = -1;
+
   int32_t old_treble2 = -1;
   int32_t old_mid2 = -1;
   int32_t old_bass2 = -1;
@@ -231,34 +232,34 @@ void myTask(void *pvParameters)
 
     if (current_mid1 != old_mid1) 
     {
-      tdaWrite(0x05, (uint8_t)current_treble1);
-      old_treble1 = current_treble1;
+      tdaWrite(0x04, (uint8_t)current_mid1);
+      old_mid1 = current_mid1;
     }
 
     if (current_bass1 != old_bass1) 
     {
-      tdaWrite(0x05, (uint8_t)current_treble1);
-      old_treble1 = current_treble1;
-    }
+      tdaWrite(0x03, (uint8_t)current_bass1);
+      old_bass1 = current_bass1;
+    }/*
 
     if (current_treble2 != old_treble2) 
     {
-      tdaWrite(0x05, (uint8_t)current_treble1);
-      old_treble1 = current_treble1;
+      tdaWrite(0x05, (uint8_t)current_treble2);
+      old_treble2 = current_treble2;
     }
 
     if (current_mid2 != old_mid2) 
     {
-      tdaWrite(0x05, (uint8_t)current_treble1);
-      old_treble1 = current_treble1;
+      tdaWrite(0x04, (uint8_t)current_mid2);
+      current_mid2 = current_mid2;
     }
 
     if (current_bass2 != old_bass2) 
     {
-      tdaWrite(0x05, (uint8_t)current_treble1);
-      old_treble1 = current_treble1;
-    }
-    
+      tdaWrite(0x03, (uint8_t)current_bass2);
+      current_bass2 = current_bass2;
+    }*/
+
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(200)); 
   }
 }
