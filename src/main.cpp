@@ -152,18 +152,21 @@ void gestionScreen()
 
   sliderTr1 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderTr1, 0, 15);
+  lv_slider_set_value(sliderTr1, 8, LV_ANIM_OFF);
   lv_obj_set_size(sliderTr1, 8, 180); 
   lv_obj_align_to(sliderTr1, treble, LV_ALIGN_OUT_BOTTOM_MID, 0, 15);
   APPLY_FADER_STYLE(sliderTr1);
 
   sliderMid1 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderMid1, 0, 15);
+  lv_slider_set_value(sliderMid1, 8, LV_ANIM_OFF);
   lv_obj_set_size(sliderMid1, 8, 180);
   lv_obj_align_to(sliderMid1, mid, LV_ALIGN_OUT_BOTTOM_MID, 0, 15);
   APPLY_FADER_STYLE(sliderMid1);
 
   sliderBass1 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderBass1, 0, 15);
+  lv_slider_set_value(sliderBass1, 8, LV_ANIM_OFF);
   lv_obj_set_size(sliderBass1, 8, 180);
   lv_obj_align_to(sliderBass1, bass, LV_ALIGN_OUT_BOTTOM_MID, 0, 15);
   APPLY_FADER_STYLE(sliderBass1);
@@ -179,6 +182,7 @@ void gestionScreen()
 
   volume1 = lv_arc_create(vol_panel);
   lv_arc_set_range(volume1, 0, 255); 
+  lv_arc_set_value(volume1, 128);
   lv_arc_set_bg_angles(volume1, 135, 45);
   lv_obj_set_size(volume1, 110, 110);
   lv_obj_remove_flag(volume1, LV_OBJ_FLAG_SCROLLABLE);
@@ -189,6 +193,7 @@ void gestionScreen()
 
   volume2 = lv_arc_create(vol_panel);
   lv_arc_set_range(volume2, 0, 255);
+  lv_arc_set_value(volume2, 128);
   lv_arc_set_bg_angles(volume2, 135, 45);
   lv_obj_set_size(volume2, 110, 110);
   lv_obj_remove_flag(volume2, LV_OBJ_FLAG_SCROLLABLE);
