@@ -16,9 +16,6 @@ const uint8_t MCP42010_CMD_SHUTDOWN = 0x20;
 lv_obj_t * sliderTr1;
 lv_obj_t * sliderMid1;
 lv_obj_t * sliderBass1;
-lv_obj_t * sliderTr2;
-lv_obj_t * sliderMid2;
-lv_obj_t * sliderBass2;
 lv_obj_t * volume1;
 lv_obj_t * volume2;
 
@@ -91,50 +88,85 @@ void init_TDA7439() {
 
 void gestionScreen()
 {
+  static lv_style_t style_arc_bg, style_arc_indicator, style_arc_knob;
+  static lv_style_t style_fader_bg, style_fader_indicator, style_fader_knob;
+  static bool styles_inited = false;
+
+  if(!styles_inited) {
+    //ARCs
+      lv_style_init(&style_arc_bg);
+      lv_style_set_arc_color(&style_arc_bg, lv_color_hex(0x2A1115)); 
+      lv_style_set_arc_width(&style_arc_bg, 15);
+      lv_style_set_arc_rounded(&style_arc_bg, false);
+
+      lv_style_init(&style_arc_indicator);
+      lv_style_set_arc_color(&style_arc_indicator, lv_color_hex(0x9B111E)); 
+      lv_style_set_arc_width(&style_arc_indicator, 15);
+      lv_style_set_arc_rounded(&style_arc_indicator, false);
+
+      lv_style_init(&style_arc_knob);
+      lv_style_set_opa(&style_arc_knob, 0); 
+
+    // Sliders
+      lv_style_init(&style_fader_bg);
+      lv_style_set_bg_color(&style_fader_bg, lv_color_hex(0x0A0A0A)); 
+      lv_style_set_radius(&style_fader_bg, 0); 
+
+      lv_style_init(&style_fader_indicator);
+      lv_style_set_bg_color(&style_fader_indicator, lv_color_hex(0x9B111E));
+      lv_style_set_radius(&style_fader_indicator, 0);
+
+      lv_style_init(&style_fader_knob);
+      lv_style_set_bg_color(&style_fader_knob, lv_color_hex(0x181818)); 
+      lv_style_set_border_width(&style_fader_knob, 2);
+      lv_style_set_border_color(&style_fader_knob, lv_color_hex(0x333333)); 
+      lv_style_set_radius(&style_fader_knob, 3); 
+      
+      lv_style_set_pad_left(&style_fader_knob, 14);
+      lv_style_set_pad_right(&style_fader_knob, 14);
+      lv_style_set_pad_top(&style_fader_knob, 8);
+      lv_style_set_pad_bottom(&style_fader_knob, 8);
+
+      styles_inited = true;
+  }
+
   lv_obj_t * treble = lv_label_create(lv_screen_active());
   lv_label_set_text(treble, "Treble");
   lv_obj_set_style_text_color(treble, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-  lv_obj_align(treble, LV_ALIGN_TOP_LEFT, 17, 5);
+  lv_obj_align(treble, LV_ALIGN_TOP_LEFT, 40, 20);
 
   lv_obj_t * mid = lv_label_create(lv_screen_active());
   lv_label_set_text(mid, "Mid");
   lv_obj_set_style_text_color(mid, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-  lv_obj_align(mid, LV_ALIGN_TOP_LEFT, 127, 5);
+  lv_obj_align(mid, LV_ALIGN_TOP_LEFT, 130, 20);
 
   lv_obj_t * bass = lv_label_create(lv_screen_active());
   lv_label_set_text(bass, "Bass");
   lv_obj_set_style_text_color(bass, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-  lv_obj_align(bass, LV_ALIGN_TOP_MID, 0, 5);
+  lv_obj_align(bass, LV_ALIGN_TOP_LEFT, 210, 20);
+
+  #define APPLY_FADER_STYLE(obj) \
+      lv_obj_add_style(obj, &style_fader_bg, LV_PART_MAIN); \
+      lv_obj_add_style(obj, &style_fader_indicator, LV_PART_INDICATOR); \
+      lv_obj_add_style(obj, &style_fader_knob, LV_PART_KNOB)
 
   sliderTr1 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderTr1, 0, 15);
-  lv_obj_set_size(sliderTr1, 20, 100);
-  lv_obj_align(sliderTr1, LV_ALIGN_TOP_LEFT, 30, 25);
+  lv_obj_set_size(sliderTr1, 8, 180); 
+  lv_obj_align_to(sliderTr1, treble, LV_ALIGN_OUT_BOTTOM_MID, 0, 15);
+  APPLY_FADER_STYLE(sliderTr1);
 
   sliderMid1 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderMid1, 0, 15);
-  lv_obj_set_size(sliderMid1, 20, 100);
-  lv_obj_align(sliderMid1, LV_ALIGN_TOP_LEFT, 130, 25);
+  lv_obj_set_size(sliderMid1, 8, 180);
+  lv_obj_align_to(sliderMid1, mid, LV_ALIGN_OUT_BOTTOM_MID, 0, 15);
+  APPLY_FADER_STYLE(sliderMid1);
 
   sliderBass1 = lv_slider_create(lv_screen_active());
   lv_slider_set_range(sliderBass1, 0, 15);
-  lv_obj_set_size(sliderBass1, 20, 100);
-  lv_obj_align(sliderBass1, LV_ALIGN_TOP_MID, 0, 25);
-
-  /*sliderTr2 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderTr2, 0, 15);
-  lv_obj_set_size(sliderTr2, 20, 100);
-  lv_obj_align(sliderTr2, LV_ALIGN_BOTTOM_LEFT, 30, -15);
-
-  sliderMid2 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderMid2, 0, 15);
-  lv_obj_set_size(sliderMid2, 20, 100);
-  lv_obj_align(sliderMid2, LV_ALIGN_BOTTOM_LEFT, 130, -15);
-
-  sliderBass2 = lv_slider_create(lv_screen_active());
-  lv_slider_set_range(sliderBass2, 0, 15);
-  lv_obj_set_size(sliderBass2, 20, 100);
-  lv_obj_align(sliderBass2, LV_ALIGN_BOTTOM_MID, 0, -15);*/
+  lv_obj_set_size(sliderBass1, 8, 180);
+  lv_obj_align_to(sliderBass1, bass, LV_ALIGN_OUT_BOTTOM_MID, 0, 15);
+  APPLY_FADER_STYLE(sliderBass1);
 
   lv_obj_t * vol_panel = lv_obj_create(lv_screen_active());
   lv_obj_set_size(vol_panel, 150, 250); 
@@ -145,32 +177,26 @@ void gestionScreen()
   lv_obj_set_style_border_width(vol_panel, 0, LV_PART_MAIN);
   lv_obj_set_scrollbar_mode(vol_panel, LV_SCROLLBAR_MODE_OFF); 
 
-  /*lv_obj_t * vol = lv_label_create(vol_panel);
-  lv_label_set_text(vol, "Volume");
-  lv_obj_set_style_text_color(vol, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-  lv_obj_align(vol, LV_ALIGN_TOP_MID, 0, 0); */
-
   volume1 = lv_arc_create(vol_panel);
-  lv_arc_set_range(volume1, 0, 10);
+  lv_arc_set_range(volume1, 0, 255); 
   lv_arc_set_bg_angles(volume1, 135, 45);
   lv_obj_set_size(volume1, 110, 110);
   lv_obj_remove_flag(volume1, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_align(volume1, LV_ALIGN_CENTER, 0, -55); 
+  lv_obj_add_style(volume1, &style_arc_bg, LV_PART_MAIN);
+  lv_obj_add_style(volume1, &style_arc_indicator, LV_PART_INDICATOR);
+  lv_obj_add_style(volume1, &style_arc_knob, LV_PART_KNOB);
 
   volume2 = lv_arc_create(vol_panel);
-  lv_arc_set_range(volume2, 0, 10);
+  lv_arc_set_range(volume2, 0, 255);
   lv_arc_set_bg_angles(volume2, 135, 45);
   lv_obj_set_size(volume2, 110, 110);
   lv_obj_remove_flag(volume2, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_align(volume2, LV_ALIGN_CENTER, 0, 65); 
+  lv_obj_add_style(volume2, &style_arc_bg, LV_PART_MAIN);
+  lv_obj_add_style(volume2, &style_arc_indicator, LV_PART_INDICATOR);
+  lv_obj_add_style(volume2, &style_arc_knob, LV_PART_KNOB);
 
-  /*lv_obj_add_event_cb(sliderTr1, slider_event_cb, LV_EVENT_VALUE_CHANGED, label);
-  lv_obj_add_event_cb(sliderMid1, slider_event_cb, LV_EVENT_VALUE_CHANGED, label);
-  lv_obj_add_event_cb(sliderBass1, slider_event_cb, LV_EVENT_VALUE_CHANGED, label);
-  lv_obj_add_event_cb(sliderTr2, slider_event_cb, LV_EVENT_VALUE_CHANGED, label);
-  lv_obj_add_event_cb(sliderMid2, slider_event_cb, LV_EVENT_VALUE_CHANGED, label);
-  lv_obj_add_event_cb(sliderBass2, slider_event_cb, LV_EVENT_VALUE_CHANGED, label);*/
-  
   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x2D2D2D), LV_PART_MAIN);
   lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_COVER, LV_PART_MAIN);
 }
@@ -205,11 +231,9 @@ void myTask(void *pvParameters)
   int32_t old_treble1 = -1;
   int32_t old_mid1 = -1;
   int32_t old_bass1 = -1;
-
-  int32_t old_treble2 = -1;
-  int32_t old_mid2 = -1;
-  int32_t old_bass2 = -1;
-
+  int32_t old_vol1 = -1;
+  int32_t old_vol2 = -1;
+  
   while (1)
   {
     lv_lock();
@@ -217,10 +241,8 @@ void myTask(void *pvParameters)
     int32_t current_treble1 = lv_slider_get_value(sliderTr1);
     int32_t current_mid1 = lv_slider_get_value(sliderMid1);
     int32_t current_bass1 = lv_slider_get_value(sliderBass1);
-
-    int32_t current_treble2 = lv_slider_get_value(sliderTr2);
-    int32_t current_mid2 = lv_slider_get_value(sliderMid2);
-    int32_t current_bass2 = lv_slider_get_value(sliderBass2);
+    int32_t current_vol1 = lv_arc_get_value(volume1);
+    int32_t current_vol2 = lv_arc_get_value(volume2);
 
     lv_unlock();
 
@@ -240,25 +262,19 @@ void myTask(void *pvParameters)
     {
       tdaWrite(0x03, (uint8_t)current_bass1);
       old_bass1 = current_bass1;
-    }/*
-
-    if (current_treble2 != old_treble2) 
-    {
-      tdaWrite(0x05, (uint8_t)current_treble2);
-      old_treble2 = current_treble2;
     }
 
-    if (current_mid2 != old_mid2) 
+    if (current_vol1 != old_vol1) 
     {
-      tdaWrite(0x04, (uint8_t)current_mid2);
-      current_mid2 = current_mid2;
+      mcp42010SetPot(MCP42010_POT_0, (uint8_t)current_vol1);
+      old_vol1 = current_vol1;
     }
 
-    if (current_bass2 != old_bass2) 
+    if (current_vol2 != old_vol2) 
     {
-      tdaWrite(0x03, (uint8_t)current_bass2);
-      current_bass2 = current_bass2;
-    }*/
+      mcp42010SetPot(MCP42010_POT_1, (uint8_t)current_vol2);
+      old_vol2 = current_vol2;
+    }
 
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(200)); 
   }
