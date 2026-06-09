@@ -2,6 +2,9 @@
 #include <Wire.h>
 #include <SPI.h>
 
+LV_IMAGE_DECLARE(pot);
+LV_IMAGE_DECLARE(sliderKnob40x25);
+
 const int SPI_CS_PIN = 3;
 
 const uint32_t MCP42010_SPI_SPEED = 2000000;
@@ -18,19 +21,6 @@ lv_obj_t * sliderMid1;
 lv_obj_t * sliderBass1;
 lv_obj_t * volume1;
 lv_obj_t * volume2;
-
-// (Tu peux ajouter les autres sliders ici si besoin)
-
-/*static void slider_event_cb(lv_event_t * e)
-{
-    lv_obj_t * slider = (lv_obj_t *)lv_event_get_target(e);
-    
-    lv_obj_t * label = (lv_obj_t *)lv_event_get_user_data(e);
-
-    int32_t value = lv_slider_get_value(slider);
-
-    lv_label_set_text_fmt(label, "Valeur : %d", (int)value);
-}*/
 
 void mcp42010Write(uint8_t command, uint8_t value)
 {
@@ -122,10 +112,13 @@ void gestionScreen()
       lv_style_set_border_color(&style_fader_knob, lv_color_hex(0x333333)); 
       lv_style_set_radius(&style_fader_knob, 3); 
       
-      lv_style_set_pad_left(&style_fader_knob, 14);
-      lv_style_set_pad_right(&style_fader_knob, 14);
-      lv_style_set_pad_top(&style_fader_knob, 8);
-      lv_style_set_pad_bottom(&style_fader_knob, 8);
+      lv_style_init(&style_fader_knob);
+      lv_style_set_bg_opa(&style_fader_knob, 0);
+      lv_style_set_bg_image_src(&style_fader_knob, &sliderKnob40x25);
+      lv_style_set_pad_left(&style_fader_knob, 16);
+      lv_style_set_pad_right(&style_fader_knob, 16);
+      lv_style_set_pad_top(&style_fader_knob, 12);
+      lv_style_set_pad_bottom(&style_fader_knob, 12);
 
       styles_inited = true;
   }
